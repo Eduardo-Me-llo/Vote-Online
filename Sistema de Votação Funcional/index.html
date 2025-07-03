@@ -1,0 +1,1565 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Votação Online</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #3498db;
+            --secondary: #2c3e50;
+            --success: #27ae60;
+            --danger: #e74c3c;
+            --warning: #f39c12;
+            --light: #ecf0f1;
+            --dark: #34495e;
+            --gray: #95a5a6;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 15px;
+        }
+        
+        /* Página de Login - Centralizada */
+        .login-page {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            padding: 20px;
+        }
+        
+        .login-card {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 450px;
+            padding: 40px;
+            margin: 0 auto; /* Centralização adicional */
+        }
+        
+        .login-card h2 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: var(--secondary);
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+        }
+        
+        .btn {
+            display: inline-block;
+            width: 100%;
+            padding: 12px;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            text-align: center;
+        }
+        
+        .btn:hover {
+            background-color: #2980b9;
+        }
+        
+        .btn[disabled] {
+            background-color: var(--gray);
+            cursor: not-allowed;
+        }
+
+        .btn-success {
+            background-color: var(--success);
+        }
+        
+        .btn-success:hover {
+            background-color: #219653;
+        }
+        
+        .btn-danger {
+            background-color: var(--danger);
+        }
+        
+        .btn-danger:hover {
+            background-color: #c0392b;
+        }
+        
+        .btn-warning {
+            background-color: var(--warning);
+        }
+        
+        .btn-warning:hover {
+            background-color: #e67e22;
+        }
+        
+        .form-footer {
+            text-align: center;
+            margin-top: 20px;
+        }
+        
+        .form-footer a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+        
+        /* Navbar */
+        .navbar {
+            background-color: var(--secondary);
+            color: white;
+            padding: 15px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .navbar-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: 24px;
+            font-weight: 700;
+        }
+        
+        .logo span {
+            color: var(--primary);
+        }
+        
+        .search-box {
+            flex-grow: 1;
+            max-width: 500px;
+            margin: 0 20px;
+            position: relative;
+        }
+        
+        .search-box input {
+            width: 100%;
+            padding: 10px 15px;
+            padding-left: 40px;
+            border: none;
+            border-radius: 30px;
+            font-size: 16px;
+        }
+        
+        .search-box i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray);
+        }
+        
+        .user-menu {
+            position: relative;
+        }
+        
+        .user-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: white;
+            border-radius: 5px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            width: 200px;
+            overflow: hidden;
+            display: none;
+        }
+        
+        .dropdown-menu.show {
+            display: block;
+        }
+        
+        .dropdown-item {
+            display: block;
+            padding: 12px 20px;
+            color: var(--dark);
+            text-decoration: none;
+            transition: background-color 0.3s;
+        }
+        
+        .dropdown-item:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .dropdown-divider {
+            height: 1px;
+            background-color: #eee;
+            margin: 5px 0;
+        }
+        
+        /* Página Home */
+        .home-page {
+            padding: 30px 0;
+        }
+        
+        .section-title {
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--light);
+            color: var(--secondary);
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .action-btn {
+            flex: 1;
+            padding: 15px;
+            background: white;
+            border: none;
+            border-radius: 8px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+        }
+        
+        .action-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .action-btn i {
+            font-size: 28px;
+            margin-bottom: 10px;
+            color: var(--primary);
+        }
+        
+        .action-btn h3 {
+            margin-bottom: 5px;
+            color: var(--secondary);
+        }
+        
+        .action-btn p {
+            color: var(--gray);
+            font-size: 14px;
+        }
+        
+        .voting-container {
+            display: flex;
+            gap: 30px;
+        }
+        
+        .public-votings {
+            flex: 1;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 3px 15px rgba(0, 0, 0, 0.08);
+            padding: 20px;
+            max-height: 600px;
+            overflow-y: auto;
+        }
+        
+        .voting-card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            padding: 20px;
+            margin-bottom: 20px;
+            transition: all 0.3s;
+            border-left: 4px solid var(--primary);
+        }
+        
+        .voting-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .voting-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .voting-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--secondary);
+        }
+        
+        .voting-status {
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .status-open {
+            background-color: rgba(39, 174, 96, 0.2);
+            color: var(--success);
+        }
+        
+        .status-closed {
+            background-color: rgba(231, 76, 60, 0.2);
+            color: var(--danger);
+        }
+        
+        .voting-meta {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+            font-size: 14px;
+            color: var(--gray);
+        }
+        
+        .voting-meta i {
+            margin-right: 5px;
+        }
+        
+        .voting-description {
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+        
+        .voting-options {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+        
+        .option-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background-color: #f8f9fa;
+            padding: 8px 15px;
+            border-radius: 30px;
+            font-size: 14px;
+        }
+        
+        .option-img {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            object-fit: cover;
+            background: #ddd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .voting-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .btn-sm {
+            padding: 8px 15px;
+            font-size: 14px;
+            width: auto;
+        }
+        
+        /* Páginas de formulário */
+        .form-page {
+            padding: 40px 0;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .form-card {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+        }
+        
+        .form-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .form-header h2 {
+            color: var(--secondary);
+            margin-bottom: 10px;
+        }
+        
+        .form-header p {
+            color: var(--gray);
+        }
+        
+        .form-row {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .form-col {
+            flex: 1;
+        }
+        
+        .option-container {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .option-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .option-title {
+            font-weight: 600;
+            color: var(--secondary);
+        }
+        
+        .image-preview {
+            width: 80px;
+            height: 80px;
+            border-radius: 5px;
+            object-fit: cover;
+            background-color: #e9ecef;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--gray);
+            font-size: 12px;
+            text-align: center;
+            margin-top: 10px;
+        }
+        
+        /* Estilos de Resultados */
+        .result-item {
+            margin-bottom: 20px;
+        }
+        
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        
+        .result-name {
+            font-weight: 600;
+        }
+        
+        .result-bar {
+            height: 10px;
+            background-color: #e9ecef;
+            border-radius: 5px;
+            overflow: hidden;
+            margin-bottom: 5px;
+        }
+        
+        .result-progress {
+            height: 100%;
+            background-color: var(--primary);
+            border-radius: 5px;
+        }
+        
+        /* Mensagens de feedback */
+        .message {
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .success-message {
+            background-color: rgba(39, 174, 96, 0.2);
+            color: var(--success);
+            border: 1px solid var(--success);
+        }
+        
+        .error-message {
+            background-color: rgba(231, 76, 60, 0.2);
+            color: var(--danger);
+            border: 1px solid var(--danger);
+        }
+        
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s, visibility 0.3s;
+        }
+
+        .modal-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 500px;
+            transform: scale(0.9);
+            transition: transform 0.3s;
+        }
+
+        .modal-overlay.show .modal-content {
+            transform: scale(1);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 15px;
+        }
+
+        .modal-header h2 {
+            color: var(--secondary);
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--gray);
+        }
+
+        .modal-body .option-vote-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            cursor: pointer;
+        }
+        .modal-body .option-vote-item:hover {
+            background: #f8f9fa;
+        }
+
+        .modal-body .option-vote-item input[type="radio"] {
+            transform: scale(1.5);
+        }
+
+        .modal-footer {
+            text-align: right;
+            margin-top: 20px;
+        }
+        
+        .voter-list {
+            list-style: none;
+            padding: 0;
+            margin-top: 15px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .voter-list li {
+            padding: 10px 15px;
+            background-color: #f8f9fa;
+            border-bottom: 1px solid #e9ecef;
+            border-radius: 4px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .voter-list li:last-child {
+            border-bottom: none;
+        }
+        
+        .voter-list li i {
+            color: var(--primary);
+        }
+
+        /* Estilos para resultados no Modal */
+        .modal-results .result-item { margin-bottom: 15px; }
+        .modal-results .result-header { font-size: 15px; }
+        .modal-results .result-bar { height: 12px; }
+        .modal-results .result-progress { background-color: var(--success); }
+
+        /* Utilitários */
+        .hidden {
+            display: none;
+        }
+        
+        .page {
+            display: none;
+        }
+        
+        .page.active {
+            display: block;
+        }
+        
+        .text-center {
+            text-align: center;
+        }
+        
+        .mb-20 {
+            margin-bottom: 20px;
+        }
+        
+        .mt-20 {
+            margin-top: 20px;
+        }
+
+        .mt-30 {
+            margin-top: 30px;
+        }
+        
+        .mb-30 {
+            margin-bottom: 30px;
+        }
+        
+        /* Responsividade */
+        @media (max-width: 768px) {
+            .voting-container {
+                flex-direction: column;
+            }
+            
+            .form-row {
+                flex-direction: column;
+                gap: 0;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+            
+            .search-box {
+                max-width: 200px;
+            }
+            
+            .login-card {
+                padding: 25px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="page login-page active" id="loginPage">
+        <div class="login-card">
+            <h2>Login</h2>
+            <div id="loginMessage" class="message hidden"></div>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="loginCpf">CPF</label>
+                    <input type="text" id="loginCpf" class="form-control" placeholder="000.000.000-00" required>
+                </div>
+                <div class="form-group">
+                    <label for="loginSenha">Senha</label>
+                    <input type="password" id="loginSenha" class="form-control" placeholder="Digite sua senha" required>
+                </div>
+                <button type="submit" class="btn">Entrar</button>
+                <div class="form-footer">
+                    <p>Não tem uma conta? <a href="#" id="goToRegister">Cadastre-se</a></p>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <div class="page" id="registerPage">
+        <div class="container" style="padding: 40px 15px;">
+            <div class="form-card">
+                <div class="form-header">
+                    <h2>Criar Conta</h2>
+                    <p>Preencha o formulário abaixo para criar sua conta</p>
+                </div>
+                <div id="registerMessage" class="message hidden"></div>
+                <form id="registerForm">
+                    <div class="form-row">
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label for="nome">Nome</label>
+                                <input type="text" id="nome" class="form-control" required>
+                            </div>
+                        </div>
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label for="sobrenome">Sobrenome</label>
+                                <input type="text" id="sobrenome" class="form-control" required>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label for="cpf">CPF</label>
+                                <input type="text" id="cpf" class="form-control" placeholder="000.000.000-00" required>
+                            </div>
+                        </div>
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label for="nascimento">Data de Nascimento</label>
+                                <input type="date" id="nascimento" class="form-control" required>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" class="form-control" placeholder="exemplo@email.com" required>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label for="estado">Estado</label>
+                                <select id="estado" class="form-control" required>
+                                    <option value="">Selecione um estado</option>
+                                    <option value="SP">São Paulo</option>
+                                    <option value="RJ">Rio de Janeiro</option>
+                                    <option value="MG">Minas Gerais</option>
+                                    <option value="RS">Rio Grande do Sul</option>
+                                    <option value="PR">Paraná</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label for="cidade">Cidade</label>
+                                <select id="cidade" class="form-control" required>
+                                    <option value="">Selecione uma cidade</option>
+                                    <option value="niteroi">Niterói</option>
+                                    <option value="marica">Maricá</option>
+                                    <option value="rio-de-janeiro">Rio de Janeiro</option>
+                                    <option value="itaborai">Itaboraí</option>
+                                    <option value="tangua">Tanguá</option>
+                                    <option value="saquarema">Saquarema</option>
+                                    <option value="sg">São Gonçalo</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Sexo</label>
+                        <div style="display: flex; gap: 20px; margin-top: 10px;">
+                            <label style="display: flex; align-items: center; gap: 5px;">
+                                <input type="radio" name="sexo" value="masculino" required> Masculino
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 5px;">
+                                <input type="radio" name="sexo" value="feminino"> Feminino
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label for="senha">Senha</label>
+                                <input type="password" id="senha" class="form-control" required>
+                            </div>
+                        </div>
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label for="confirmarSenha">Confirmar Senha</label>
+                                <input type="password" id="confirmarSenha" class="form-control" required>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-success">Cadastrar</button>
+                    <div class="form-footer mt-20">
+                        <p>Já tem uma conta? <a href="#" id="goToLogin">Faça login</a></p>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="navbar hidden" id="navbar">
+        <div class="container navbar-content">
+            <div class="logo">Vote<span>Online</span></div>
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" id="searchInput" placeholder="Pesquisar votação...">
+            </div>
+            <div class="user-menu">
+                <button class="user-btn">
+                    <i class="fas fa-user-circle fa-lg"></i>
+                    <span id="usernameDisplay">Usuário</span>
+                </button>
+                <div class="dropdown-menu" id="dropdownMenu">
+                    <a href="#" class="dropdown-item"><i class="fas fa-user-edit"></i> Editar Perfil</a>
+                    <a href="#" class="dropdown-item" id="myVotingsBtn"><i class="fas fa-history"></i> Minhas Votações</a>
+                    <div class="dropdown-divider"></div>
+                    <a href="#" class="dropdown-item" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="page home-page hidden" id="homePage">
+        <div class="container">
+            <div id="globalMessage" class="hidden"></div>
+            <h1 class="section-title">Votações Online</h1>
+            
+            <div class="action-buttons">
+                <div class="action-btn" id="createVotingBtn">
+                    <i class="fas fa-plus-circle"></i>
+                    <h3>Criar Votação</h3>
+                    <p>Crie uma nova votação pública ou privada</p>
+                </div>
+                <div class="action-btn" id="manageVotingBtn">
+                    <i class="fas fa-chart-bar"></i>
+                    <h3>Consultar Votações</h3>
+                    <p>Gerencie suas votações criadas</p>
+                </div>
+            </div>
+            
+            <div class="voting-container">
+                <div class="public-votings">
+                    <h2 class="section-title">Votações Públicas</h2>
+                    <div id="publicVotingsList"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="page form-page hidden" id="createVotingPage">
+        <div class="container">
+            <div class="form-card">
+                <div class="form-header">
+                    <h2>Criar Nova Votação</h2>
+                    <p>Preencha os dados abaixo para criar uma nova votação</p>
+                </div>
+                <div id="votingMessage" class="message hidden"></div>
+                <form id="votingForm">
+                    <div class="form-group">
+                        <label for="titulo">Título da Votação</label>
+                        <input type="text" id="titulo" class="form-control" placeholder="Ex: Melhor filme do ano" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="descricao">Descrição</label>
+                        <textarea id="descricao" class="form-control" rows="4" placeholder="Descreva o propósito desta votação..." required></textarea>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label>Privacidade</label>
+                                <div style="display: flex; gap: 20px; margin-top: 10px;">
+                                    <label style="display: flex; align-items: center; gap: 5px;">
+                                        <input type="radio" name="privacidade" value="publico" checked required> Pública
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 5px;">
+                                        <input type="radio" name="privacidade" value="privado"> Privada
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label for="dataLimite">Data Limite</label>
+                                <input type="datetime-local" id="dataLimite" class="form-control" required>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Opções de Votação</label>
+                        <div class="mb-20">
+                            <label>Quantidade de opções:</label>
+                            <select id="numOpcoes" class="form-control" style="width: 100px; display: inline-block; margin-left: 10px;">
+                                <option value="2">2</option>
+                                <option value="3" selected>3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                                <option value="6">6</option>
+                            </select>
+                        </div>
+                        
+                        <div id="opcoesContainer">
+                            </div>
+                    </div>
+                    
+                    <div class="text-center" style="display: flex; gap: 15px;">
+                        <button type="submit" class="btn btn-success">Criar Votação</button>
+                        <button type="button" class="btn btn-danger" id="cancelCreateVoting">Cancelar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="page form-page hidden" id="manageVotingPage">
+        <div class="container">
+            <div class="form-card">
+                <div class="form-header">
+                    <h2>Minhas Votações</h2>
+                    <p>Gerencie suas votações criadas</p>
+                </div>
+                <div id="myVotingsList"></div>
+                <div class="text-center mt-30">
+                    <button class="btn" id="backToHomeFromManage">Voltar para Home</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="voteModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="voteModalTitle">Votar em...</h2>
+                <button class="close-modal" id="closeVoteModal">&times;</button>
+            </div>
+            <form id="voteModalForm">
+                <div class="modal-body" id="voteModalBody">
+                    </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-success">Confirmar Voto</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="detailsModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="detailsModalTitle">Detalhes da Votação</h2>
+                <button class="close-modal" id="closeDetailsModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="modal-results">
+                    <h3 style="color: var(--secondary); margin-bottom: 10px;">Resultados</h3>
+                    <div id="detailsModalResults"></div>
+                </div>
+                <hr style="margin: 25px 0;">
+                <div>
+                    <h3 style="color: var(--secondary); margin-bottom: 5px;">Eleitores</h3>
+                    <ul id="detailsModalVoterList" class="voter-list">
+                        </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Banco de dados simulado usando localStorage
+        const DB = {
+            save: (key, data) => localStorage.setItem(key, JSON.stringify(data)),
+            get: (key) => {
+                const data = localStorage.getItem(key);
+                return data ? JSON.parse(data) : null;
+            },
+            init: function() {
+                if (!this.get('users')) this.save('users', []);
+                if (!this.get('votings')) this.save('votings', []);
+            },
+            addUser: function(user) {
+                const users = this.get('users') || [];
+                if (users.some(u => u.cpf === user.cpf)) {
+                    return { success: false, message: 'CPF já cadastrado.' };
+                }
+                if (users.some(u => u.email === user.email)) {
+                    return { success: false, message: 'Email já cadastrado.' };
+                }
+                users.push(user);
+                this.save('users', users);
+                return { success: true, user };
+            },
+            findUser: (cpf, password) => {
+                const users = DB.get('users') || [];
+                return users.find(u => u.cpf === cpf && u.senha === password);
+            },
+            addVoting: function(voting) {
+                const votings = this.get('votings') || [];
+                votings.unshift(voting); // Adicionar no início para mostrar os mais recentes primeiro
+                this.save('votings', votings);
+                return { success: true, voting };
+            },
+            updateVoting: function(updatedVoting) {
+                let votings = this.get('votings') || [];
+                votings = votings.map(v => v.id === updatedVoting.id ? updatedVoting : v);
+                this.save('votings', votings);
+            },
+            deleteVoting: function(votingId) {
+                let votings = this.get('votings') || [];
+                votings = votings.filter(v => v.id !== votingId);
+                this.save('votings', votings);
+            },
+            getVotingById: function(votingId) {
+                const votings = this.get('votings') || [];
+                return votings.find(v => v.id === votingId);
+            },
+            getVotingsByCreator: (creatorId) => {
+                const votings = DB.get('votings') || [];
+                return votings.filter(v => v.creatorId === creatorId);
+            },
+            getPublicVotings: () => {
+                const votings = DB.get('votings') || [];
+                return votings.filter(v => v.privacidade === 'publico');
+            }
+        };
+        
+        // Inicializar o banco de dados
+        DB.init();
+        
+        // Estado do aplicativo
+        let currentUser = null;
+        
+        // Funções auxiliares
+        function showMessage(elementId, message, isSuccess = true, duration = 5000) {
+            const element = document.getElementById(elementId);
+            element.textContent = message;
+            element.className = isSuccess ? 'message success-message' : 'message error-message';
+            element.classList.remove('hidden');
+            
+            setTimeout(() => {
+                element.classList.add('hidden');
+            }, duration);
+        }
+
+        // Validação de CPF (formato brasileiro)
+        function validateCPF(cpf) {
+            cpf = cpf.replace(/[^\d]+/g,'');    
+            if(cpf == '') return false; 
+            // Elimina CPFs invalidos conhecidos    
+            if (cpf.length != 11 || 
+                cpf == "00000000000" || 
+                cpf == "11111111111" || 
+                cpf == "22222222222" || 
+                cpf == "33333333333" || 
+                cpf == "44444444444" || 
+                cpf == "55555555555" || 
+                cpf == "66666666666" || 
+                cpf == "77777777777" || 
+                cpf == "88888888888" || 
+                cpf == "99999999999")
+                    return false;       
+            // Valida 1o digito 
+            let add = 0;    
+            for (let i=0; i < 9; i ++)      
+                add += parseInt(cpf.charAt(i)) * (10 - i);  
+                let rev = 11 - (add % 11);  
+                if (rev == 10 || rev == 11)     
+                    rev = 0;    
+                if (rev != parseInt(cpf.charAt(9)))     
+                    return false;       
+            // Valida 2o digito 
+            add = 0;    
+            for (let i = 0; i < 10; i ++)       
+                add += parseInt(cpf.charAt(i)) * (11 - i);  
+            rev = 11 - (add % 11);  
+            if (rev == 10 || rev == 11) 
+                rev = 0;    
+            if (rev != parseInt(cpf.charAt(10)))
+                return false;       
+            return true;   
+        }
+        
+        function formatDate(dateString) {
+            const options = { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' };
+            return new Date(dateString).toLocaleDateString('pt-BR', options);
+        }
+        
+        // Navegação entre páginas
+        document.addEventListener('DOMContentLoaded', function() {
+            const pages = {
+                loginPage: document.getElementById('loginPage'),
+                registerPage: document.getElementById('registerPage'),
+                homePage: document.getElementById('homePage'),
+                createVotingPage: document.getElementById('createVotingPage'),
+                manageVotingPage: document.getElementById('manageVotingPage')
+            };
+            const navbar = document.getElementById('navbar');
+            const dropdownMenu = document.getElementById('dropdownMenu');
+            const usernameDisplay = document.getElementById('usernameDisplay');
+            const publicVotingsList = document.getElementById('publicVotingsList');
+            const myVotingsList = document.getElementById('myVotingsList');
+            const searchInput = document.getElementById('searchInput');
+            const numOpcoesSelect = document.getElementById('numOpcoes');
+            
+            function showPage(pageId) {
+                Object.values(pages).forEach(p => p.classList.remove('active'));
+                pages[pageId].classList.add('active');
+                
+                const needsNavbar = ['homePage', 'createVotingPage', 'manageVotingPage'].includes(pageId);
+                navbar.classList.toggle('hidden', !needsNavbar);
+                
+                if (pageId === 'homePage') loadPublicVotings();
+                if (pageId === 'manageVotingPage') loadMyVotings();
+                if (pageId === 'createVotingPage') {
+                    document.getElementById('votingForm').reset();
+                    generateOptions(numOpcoesSelect.value);
+                }
+            }
+            
+            function loadPublicVotings(votingsToShow = DB.getPublicVotings()) {
+                publicVotingsList.innerHTML = '';
+                
+                if (votingsToShow.length === 0) {
+                    publicVotingsList.innerHTML = '<p class="text-center">Nenhuma votação pública disponível no momento.</p>';
+                    return;
+                }
+                
+                votingsToShow.forEach(voting => {
+                    const votingCard = document.createElement('div');
+                    votingCard.className = 'voting-card';
+                    
+                    const isOpen = new Date(voting.dataLimite) > new Date();
+                    const totalVotes = voting.opcoes.reduce((acc, op) => acc + op.votos, 0);
+                    const userHasVoted = voting.voters.includes(currentUser?.id);
+
+                    const voteButtonHTML = isOpen 
+                        ? `<button class="btn btn-sm btn-success" onclick="window.voteOnPoll('${voting.id}')" ${userHasVoted ? 'disabled' : ''}>${userHasVoted ? 'Já Votou' : 'Votar'}</button>` 
+                        : '';
+                    
+                    votingCard.innerHTML = `
+                        <div class="voting-header">
+                            <h3 class="voting-title">${voting.titulo}</h3>
+                            <span class="voting-status ${isOpen ? 'status-open' : 'status-closed'}">${isOpen ? 'Em andamento' : 'Encerrada'}</span>
+                        </div>
+                        <div class="voting-meta">
+                            <span><i class="fas fa-user"></i> ${voting.creatorName}</span>
+                            <span><i class="fas fa-calendar"></i> Até ${formatDate(voting.dataLimite)}</span>
+                            <span><i class="fas fa-users"></i> ${totalVotes} votos</span>
+                        </div>
+                        <p class="voting-description">${voting.descricao}</p>
+                        <div class="voting-options">
+                            ${voting.opcoes.map(opcao => `
+                                <div class="option-item">
+                                    <img src="${opcao.imagem || ''}" class="option-img" onerror="this.innerHTML='<i class=\\'fas fa-image\\'></i>'; this.style.fontSize='14px';" alt="Opção">
+                                    <span>${opcao.nome}</span>
+                                </div>`).join('')}
+                        </div>
+                        <div class="voting-actions">
+                            <button class="btn btn-sm" onclick="window.viewVotingDetails('${voting.id}')">Ver Detalhes</button>
+                            ${voteButtonHTML}
+                        </div>`;
+                    publicVotingsList.appendChild(votingCard);
+                });
+            }
+
+            function loadMyVotings() {
+                if (!currentUser) return;
+                
+                const myVotings = DB.getVotingsByCreator(currentUser.id);
+                myVotingsList.innerHTML = '';
+                
+                if (myVotings.length === 0) {
+                    myVotingsList.innerHTML = '<p class="text-center">Você ainda não criou nenhuma votação.</p>';
+                    return;
+                }
+                
+                myVotings.forEach(voting => {
+                    const votingCard = document.createElement('div');
+                    votingCard.className = 'voting-card';
+                    
+                    const isOpen = new Date(voting.dataLimite) > new Date();
+                    const totalVotes = voting.opcoes.reduce((acc, op) => acc + op.votos, 0);
+                    
+                    votingCard.innerHTML = `
+                        <div class="voting-header">
+                            <h3 class="voting-title">${voting.titulo}</h3>
+                            <span class="voting-status ${isOpen ? 'status-open' : 'status-closed'}">${isOpen ? 'Em andamento' : 'Encerrada'}</span>
+                        </div>
+                        <div class="voting-meta">
+                            <span><i class="fas fa-calendar"></i> Até ${formatDate(voting.dataLimite)}</span>
+                            <span><i class="fas fa-users"></i> ${totalVotes} votos</span>
+                        </div>
+                        <div class="result-item">
+                            <h4 style="color: var(--secondary); margin-bottom: 15px;">${isOpen ? 'Resultados Parciais' : 'Resultados Finais'}</h4>
+                            ${voting.opcoes.map(opcao => {
+                                const percentage = totalVotes > 0 ? Math.round((opcao.votos / totalVotes) * 100) : 0;
+                                return `
+                                <div class="result-item">
+                                    <div class="result-header">
+                                        <span class="result-name">${opcao.nome}</span>
+                                        <span>${percentage}% (${opcao.votos} votos)</span>
+                                    </div>
+                                    <div class="result-bar">
+                                        <div class="result-progress" style="width: ${percentage}%"></div>
+                                    </div>
+                                </div>`;
+                            }).join('')}
+                        </div>
+                        <div class="voting-actions mt-20">
+                            <button class="btn btn-sm" onclick="window.viewVotingDetails('${voting.id}')">Ver Eleitores</button>
+                            ${isOpen ? `<button class="btn btn-sm btn-warning" onclick="window.endVoting('${voting.id}')">Encerrar Agora</button>` : ''}
+                            <button class="btn btn-sm btn-danger" onclick="window.deleteVoting('${voting.id}')">Excluir</button>
+                        </div>`;
+                    myVotingsList.appendChild(votingCard);
+                });
+            }
+
+            function generateOptions(count) {
+                const container = document.getElementById('opcoesContainer');
+                container.innerHTML = '';
+                for (let i = 1; i <= count; i++) {
+                    const optionId = `option_${i}`;
+                    container.innerHTML += `
+                        <div class="option-container">
+                            <div class="option-header"><span class="option-title">Opção ${i}</span></div>
+                            <div class="form-group">
+                                <label for="${optionId}_name">Nome da Opção</label>
+                                <input type="text" id="${optionId}_name" class="form-control option-name" placeholder="Nome da opção" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="${optionId}_image">Imagem (opcional)</label>
+                                <input type="file" id="${optionId}_image" class="form-control option-image" accept="image/*">
+                                <img class="image-preview" id="${optionId}_preview" alt="Preview">
+                            </div>
+                        </div>`;
+                }
+                // Adicionar listeners para preview de imagem
+                document.querySelectorAll('.option-image').forEach(input => {
+                    input.addEventListener('change', handleImagePreview);
+                });
+            }
+
+            function handleImagePreview(event) {
+                const input = event.target;
+                const preview = input.nextElementSibling;
+                const file = input.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        preview.src = e.target.result;
+                        preview.style.display = 'block';
+                    }
+                    reader.readAsDataURL(file);
+                }
+            }
+
+            // Event Listeners de Navegação
+            document.getElementById('goToRegister').addEventListener('click', (e) => { e.preventDefault(); showPage('registerPage'); });
+            document.getElementById('goToLogin').addEventListener('click', (e) => { e.preventDefault(); showPage('loginPage'); });
+            document.getElementById('logoutBtn').addEventListener('click', (e) => {
+                e.preventDefault();
+                currentUser = null;
+                showPage('loginPage');
+                navbar.classList.add('hidden');
+            });
+            document.getElementById('myVotingsBtn').addEventListener('click', (e) => { e.preventDefault(); showPage('manageVotingPage'); dropdownMenu.classList.remove('show'); });
+            document.getElementById('createVotingBtn').addEventListener('click', () => showPage('createVotingPage'));
+            document.getElementById('manageVotingBtn').addEventListener('click', () => showPage('manageVotingPage'));
+            document.getElementById('cancelCreateVoting').addEventListener('click', () => showPage('homePage'));
+            document.getElementById('backToHomeFromManage').addEventListener('click', () => showPage('homePage'));
+            document.querySelector('.user-btn').addEventListener('click', () => dropdownMenu.classList.toggle('show'));
+            window.addEventListener('click', (e) => {
+                if (!e.target.closest('.user-menu')) dropdownMenu.classList.remove('show');
+            });
+
+            // Formulários
+            document.getElementById('loginForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                const cpf = document.getElementById('loginCpf').value.replace(/\D/g, '');
+                const senha = document.getElementById('loginSenha').value;
+                const user = DB.findUser(cpf, senha);
+                if (user) {
+                    currentUser = user;
+                    usernameDisplay.textContent = user.nome;
+                    showPage('homePage');
+                } else {
+                    showMessage('loginMessage', 'CPF ou senha incorretos.', false);
+                }
+            });
+
+            document.getElementById('registerForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                const senha = document.getElementById('senha').value;
+                const confirmarSenha = document.getElementById('confirmarSenha').value;
+                const cpf = document.getElementById('cpf').value;
+
+                if (senha !== confirmarSenha) {
+                    return showMessage('registerMessage', 'As senhas não coincidem.', false);
+                }
+                if (!validateCPF(cpf)) {
+                    return showMessage('registerMessage', 'CPF inválido. Verifique o número digitado.', false);
+                }
+                
+                const user = {
+                    id: Date.now().toString(),
+                    nome: document.getElementById('nome').value,
+                    sobrenome: document.getElementById('sobrenome').value,
+                    cpf: cpf.replace(/\D/g, ''),
+                    nascimento: document.getElementById('nascimento').value,
+                    email: document.getElementById('email').value,
+                    estado: document.getElementById('estado').value,
+                    cidade: document.getElementById('cidade').value,
+                    sexo: document.querySelector('input[name="sexo"]:checked').value,
+                    senha: senha
+                };
+                
+                const result = DB.addUser(user);
+                if (result.success) {
+                    showMessage('registerMessage', 'Cadastro realizado com sucesso! Faça login.', true);
+                    setTimeout(() => showPage('loginPage'), 2000);
+                } else {
+                    showMessage('registerMessage', result.message, false);
+                }
+            });
+            
+            numOpcoesSelect.addEventListener('change', (e) => generateOptions(e.target.value));
+
+            document.getElementById('votingForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                if (!currentUser) return showMessage('votingMessage', 'Você precisa estar logado.', false);
+
+                const dataLimite = new Date(document.getElementById('dataLimite').value);
+                if (dataLimite <= new Date()) {
+                    return showMessage('votingMessage', 'A data limite não pode ser no passado.', false);
+                }
+
+                const optionContainers = document.querySelectorAll('.option-container');
+                const opcoes = Array.from(optionContainers).map((container, index) => ({
+                    id: `${Date.now()}_${index}`,
+                    nome: container.querySelector('.option-name').value,
+                    imagem: container.querySelector('.image-preview').src,
+                    votos: 0
+                }));
+
+                if (opcoes.some(op => !op.nome)) {
+                    return showMessage('votingMessage', 'Todas as opções devem ter um nome.', false);
+                }
+                if (opcoes.length < 2) {
+                    return showMessage('votingMessage', 'A votação precisa de no mínimo 2 opções.', false);
+                }
+                
+                const voting = {
+                    id: Date.now().toString(),
+                    titulo: document.getElementById('titulo').value,
+                    descricao: document.getElementById('descricao').value,
+                    privacidade: document.querySelector('input[name="privacidade"]:checked').value,
+                    dataLimite: document.getElementById('dataLimite').value,
+                    creatorId: currentUser.id,
+                    creatorName: `${currentUser.nome} ${currentUser.sobrenome}`,
+                    opcoes: opcoes,
+                    voters: [] // Array para controlar quem já votou
+                };
+                
+                DB.addVoting(voting);
+                showMessage('globalMessage', 'Votação criada com sucesso!', true);
+                showPage('homePage');
+            });
+            
+            searchInput.addEventListener('input', function() {
+                const term = this.value.toLowerCase();
+                const publicVotings = DB.getPublicVotings();
+                if (!term) return loadPublicVotings(publicVotings);
+                
+                const filtered = publicVotings.filter(v => 
+                    v.titulo.toLowerCase().includes(term) || 
+                    v.descricao.toLowerCase().includes(term)
+                );
+                loadPublicVotings(filtered);
+            });
+
+            // Inicialização da página
+            generateOptions(numOpcoesSelect.value); // Gerar opções iniciais
+            showPage('loginPage'); // Começar na página de login
+        });
+        
+        // Funções globais para ações de votação
+        window.viewVotingDetails = (id) => {
+            const detailsModal = document.getElementById('detailsModal');
+            const detailsModalTitle = document.getElementById('detailsModalTitle');
+            const resultsContainer = document.getElementById('detailsModalResults');
+            const voterList = document.getElementById('detailsModalVoterList');
+            const closeDetailsModal = document.getElementById('closeDetailsModal');
+
+            const voting = DB.getVotingById(id);
+            if (!voting) return;
+
+            const allUsers = DB.get('users');
+            if (!allUsers) return;
+
+            // Popula o Título do Modal
+            detailsModalTitle.textContent = voting.titulo;
+            
+            // Limpa conteúdo anterior
+            resultsContainer.innerHTML = '';
+            voterList.innerHTML = '';
+
+            // Calcula e exibe os resultados (porcentagem e contagem)
+            const totalVotes = voting.voters.length;
+            voting.opcoes.forEach(option => {
+                const percentage = totalVotes > 0 ? Math.round((option.votos / totalVotes) * 100) : 0;
+                const resultHTML = `
+                    <div class="result-item">
+                        <div class="result-header">
+                            <span class="result-name">${option.nome}</span>
+                            <span>${percentage}% (${option.votos} ${option.votos === 1 ? 'voto' : 'votos'})</span>
+                        </div>
+                        <div class="result-bar">
+                            <div class="result-progress" style="width: ${percentage}%"></div>
+                        </div>
+                    </div>
+                `;
+                resultsContainer.innerHTML += resultHTML;
+            });
+
+            // Exibe a lista de eleitores
+            if (voting.voters && totalVotes > 0) {
+                voting.voters.forEach(voterId => {
+                    const user = allUsers.find(u => u.id === voterId);
+                    if (user) {
+                        const listItem = document.createElement('li');
+                        listItem.innerHTML = `<i class="fas fa-user-check"></i> ${user.nome} ${user.sobrenome}`;
+                        voterList.appendChild(listItem);
+                    }
+                });
+            } else {
+                voterList.innerHTML = '<li>Nenhum voto registrado ainda.</li>';
+            }
+
+            // Mostra o modal
+            detailsModal.classList.add('show');
+
+            // Lógica para fechar o modal
+            closeDetailsModal.onclick = () => detailsModal.classList.remove('show');
+            detailsModal.onclick = (e) => {
+                if (e.target === detailsModal) {
+                    detailsModal.classList.remove('show');
+                }
+            };
+        };
+        
+        window.voteOnPoll = (id) => {
+            const voteModal = document.getElementById('voteModal');
+            const voteModalTitle = document.getElementById('voteModalTitle');
+            const voteModalBody = document.getElementById('voteModalBody');
+            const voteModalForm = document.getElementById('voteModalForm');
+
+            const voting = DB.getVotingById(id);
+            if (!voting || !currentUser) return;
+            
+            if (new Date(voting.dataLimite) < new Date()) {
+                showMessage('globalMessage', 'Esta votação já foi encerrada.', false);
+                loadPublicVotings();
+                return;
+            }
+            if(voting.voters.includes(currentUser.id)) {
+                showMessage('globalMessage', 'Você já votou nesta enquete.', false);
+                return;
+            }
+
+            voteModalTitle.textContent = voting.titulo;
+            voteModalBody.innerHTML = '';
+            voting.opcoes.forEach(op => {
+                voteModalBody.innerHTML += `
+                    <label class="option-vote-item">
+                        <input type="radio" name="voteOption" value="${op.id}" required>
+                        <img src="${op.imagem || ''}" class="option-img" onerror="this.innerHTML='<i class=\\'fas fa-image\\'></i>'; this.style.fontSize='14px';" alt="Opção">
+                        <span>${op.nome}</span>
+                    </label>
+                `;
+            });
+
+            voteModal.classList.add('show');
+            
+            voteModalForm.onsubmit = function(e) {
+                e.preventDefault();
+                const selectedOptionId = new FormData(voteModalForm).get('voteOption');
+                if(!selectedOptionId) return;
+
+                const option = voting.opcoes.find(o => o.id === selectedOptionId);
+                if(option) {
+                    option.votos++;
+                    voting.voters.push(currentUser.id);
+                    DB.updateVoting(voting);
+                    showMessage('globalMessage', 'Voto registrado com sucesso!', true);
+                }
+                voteModal.classList.remove('show');
+                loadPublicVotings(); // Atualiza a UI
+                loadMyVotings(); // Atualiza a UI se estiver na página de "minhas votações"
+            };
+            
+            document.getElementById('closeVoteModal').onclick = () => voteModal.classList.remove('show');
+            voteModal.onclick = (e) => {
+                if (e.target === voteModal) voteModal.classList.remove('show');
+            }
+        };
+        
+        window.endVoting = (id) => {
+            if (confirm('Tem certeza que deseja encerrar esta votação agora? Esta ação não pode ser desfeita.')) {
+                const voting = DB.getVotingById(id);
+                if(voting) {
+                    voting.dataLimite = new Date().toISOString();
+                    DB.updateVoting(voting);
+                    loadMyVotings();
+                }
+            }
+        };
+        
+        window.deleteVoting = (id) => {
+            if (confirm('Tem certeza que deseja EXCLUIR esta votação? Todos os dados serão perdidos permanentemente.')) {
+                DB.deleteVoting(id);
+                loadMyVotings();
+                loadPublicVotings();
+            }
+        };
+    </script>
+</body>
+</html>
